@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="az" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Abulfaz Mustafazade Portfolio</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+/* ── Reset & Base ── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a1628; --bg2:#0f2044; --bg3:#1a2d50;
+  --text:#eef3ff; --text2:#a8c8f0; --muted:rgba(130,170,220,.55);
+  --accent:#2d7fff; --accent2:#1a5cdb; --border:rgba(168,212,255,.12);
+  --success:#4ade80; --warn:#fbbf24; --danger:#f87171;
+  --r:8px; --font:'Palatino Linotype','Palatino',Georgia,serif;
+  --ui:'Trebuchet MS','Segoe UI',sans-serif;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--ui);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── LOGIN SCREEN ── */
+#loginScreen{
+  display:flex;align-items:center;justify-content:center;min-height:100vh;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,92,219,.15) 0%,transparent 70%);
+}
+.login-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:48px;width:100%;max-width:400px;text-align:center;
+}
+.login-logo{font-family:var(--font);font-size:2rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.login-logo span{color:var(--accent)}
+.login-sub{color:var(--muted);font-size:.85rem;margin-bottom:32px}
+.login-card input{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 16px;color:var(--text);font-family:var(--ui);
+  font-size:.9rem;margin-bottom:14px;outline:none;transition:border-color .2s;
+}
+.login-card input:focus{border-color:var(--accent)}
+.login-btn{
+  width:100%;padding:13px;background:var(--accent2);border:1px solid var(--accent);
+  color:#fff;font-family:var(--ui);font-size:.88rem;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;border-radius:var(--r);cursor:pointer;transition:all .2s;margin-top:6px;
+}
+.login-btn:hover{background:var(--accent);box-shadow:0 8px 30px rgba(45,127,255,.4)}
+.login-err{color:var(--danger);font-size:.82rem;margin-top:10px;display:none}
+
+/* ── MAIN LAYOUT ── */
+#adminApp{display:none;flex-direction:column;min-height:100vh}
+.admin-header{
+  background:rgba(10,22,40,.95);border-bottom:1px solid var(--border);
+  padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);
+}
+.admin-logo{font-family:var(--font);font-size:1.05rem;font-weight:700;color:var(--text)}
+.admin-logo span{color:var(--accent)}
+.admin-header-right{display:flex;align-items:center;gap:14px}
+.btn-sm{
+  padding:7px 16px;border-radius:var(--r);font-family:var(--ui);font-size:.75rem;
+  font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+  border:1px solid;transition:all .2s;
+}
+.btn-primary{background:var(--accent2);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent)}
+.btn-ghost{background:transparent;border-color:var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:rgba(45,127,255,.4);color:var(--text)}
+.btn-danger{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3);color:var(--danger)}
+.btn-danger:hover{background:rgba(248,113,113,.2)}
+
+.admin-body{display:flex;flex:1}
+.sidebar{
+  width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  padding:24px 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;
+}
+.sidebar-section{margin-bottom:24px}
+.sidebar-label{font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding:0 20px;margin-bottom:8px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 20px;
+  font-size:.85rem;color:var(--text2);cursor:pointer;transition:all .18s;border:none;
+  background:none;width:100%;text-align:left;
+}
+.nav-item:hover{color:var(--text);background:rgba(45,127,255,.08)}
+.nav-item.active{color:var(--accent);background:rgba(45,127,255,.12);border-right:2px solid var(--accent)}
+.nav-icon{width:18px;text-align:center;font-size:1rem}
+
+.main-content{flex:1;padding:32px;overflow-y:auto;max-width:900px}
+.page-title{font-family:var(--font);font-size:1.6rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.page-desc{font-size:.85rem;color:var(--muted);margin-bottom:28px}
+
+/* ── PANELS ── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ── CARDS ── */
+.admin-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
+  padding:24px;margin-bottom:20px;
+}
+.admin-card h3{font-family:var(--font);font-size:1rem;font-weight:700;color:var(--text);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+
+/* ── FORM ELEMENTS ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+label.lbl{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:6px}
+.badge-required{background:rgba(248,113,113,.15);color:var(--danger);font-size:.6rem;padding:1px 5px;border-radius:3px}
+input.inp, textarea.inp, select.inp{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r);
+  padding:10px 14px;color:var(--text);font-family:var(--ui);font-size:.88rem;
+  width:100%;outline:none;transition:border-color .2s,box-shadow .2s;
+}
+input.inp:focus, textarea.inp:focus, select.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,127,255,.1)}
+input.inp::placeholder, textarea.inp::placeholder{color:var(--muted)}
+textarea.inp{resize:vertical;min-height:80px}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.data-table th{
+  text-align:left;padding:10px 14px;font-size:.68rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  border-bottom:2px solid var(--border);
+}
+.data-table td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(45,127,255,.05)}
+
+/* ── STATUS BADGES ── */
+.status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:.68rem;font-weight:600;letter-spacing:.06em}
+.status-active{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.25);color:var(--success)}
+.status-past{background:rgba(130,170,220,.08);border:1px solid var(--border);color:var(--muted)}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:28px;right:28px;z-index:9999;
+  background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.35);
+  color:var(--success);padding:12px 20px;border-radius:var(--r);
+  font-size:.85rem;font-family:var(--ui);
+  transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none;
+}
+#toast.show{transform:none;opacity:1}
+#toast.err{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.35);color:var(--danger)}
+
+/* ── DASHBOARD STATS ── */
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.dash-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center}
+.dash-num{font-family:var(--font);font-size:2rem;font-weight:700;color:var(--text);line-height:1}
+.dash-num span{color:var(--accent)}
+.dash-lbl{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:5px}
+
+/* ── ACCORDION ── */
+.accordion-item{border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.accordion-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;cursor:pointer;background:var(--bg2);transition:background .2s;
+  font-size:.88rem;color:var(--text);font-weight:600;
+}
+.accordion-head:hover{background:var(--bg3)}
+.accordion-head .arrow{transition:transform .2s;color:var(--muted)}
+.accordion-body{display:none;padding:18px;background:rgba(255,255,255,.02);border-top:1px solid var(--border)}
+.accordion-item.open .accordion-head .arrow{transform:rotate(180deg)}
+.accordion-item.open .accordion-body{display:block}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .form-row{grid-template-columns:1fr}
+  .dash-grid{grid-template-columns:1fr 1fr}
+  .sidebar{display:none}
+  .main-content{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">AM<span>.</span> Admin</div>
+    <div class="login-sub">Portfolio İdarəetmə Paneli</div>
+    <input type="text" id="loginUser" placeholder="İstifadəçi adı" autocomplete="username">
+    <input type="password" id="loginPass" placeholder="Şifrə" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Daxil ol →</button>
+    <div class="login-err" id="loginErr">İstifadəçi adı və ya şifrə yanlışdır.</div>
+    <p style="color:var(--muted);font-size:.75rem;margin-top:20px">Default: <code style="color:var(--accent)">admin</code> / <code style="color:var(--accent)">am2025!</code></p>
+  </div>
+</div>
+
+<!-- ═══ ADMIN APP ═══ -->
+<div id="adminApp">
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="admin-logo">AM<span>.</span> Admin Panel</div>
+    <div class="admin-header-right">
+      <span id="headerTime" style="color:var(--muted);font-size:.8rem"></span>
+      <a href="../az/index.html" target="_blank" class="btn-sm btn-ghost">Sayta bax ↗</a>
+      <button class="btn-sm btn-danger" onclick="doLogout()">Çıxış</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Ümumi</div>
+        <button class="nav-item active" onclick="showPanel('dashboard')"><span class="nav-icon">📊</span> Dashboard</button>
+        <button class="nav-item" onclick="showPanel('settings')"><span class="nav-icon">⚙️</span> Ümumi Məlumatlar</button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Məzmun</div>
+        <button class="nav-item" onclick="showPanel('about')"><span class="nav-icon">👤</span> Haqqımda</button>
+        <button class="nav-item" onclick="showPanel('experience')"><span class="nav-icon">💼</span> İş Təcrübəsi</button>
+        <button class="nav-item" onclick="showPanel('education')"><span class="nav-icon">🎓</span> Təhsil</button>
+        <button class="nav-item" onclick="showPanel('services')"><span class="nav-icon">⚡</span> Xidmətlər</button>
+        <button class="nav-item" onclick="showPanel('projects')"><span class="nav-icon">📁</span> Layihələr</button>
+        <button class="nav-item" onclick="showPanel('skills')"><span class="nav-icon">🛠️</span> Bacarıqlar</button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">SEO & Analitika</div>
+        <button class="nav-item" onclick="showPanel('seo')"><span class="nav-icon">🔍</span> SEO Parametrləri</button>
+        <button class="nav-item" onclick="showPanel('analytics')"><span class="nav-icon">📈</span> Google Analitika</button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Sistem</div>
+        <button class="nav-item" onclick="showPanel('backup')"><span class="nav-icon">💾</span> Yedəkləmə</button>
+        <button class="nav-item" onclick="showPanel('password')"><span class="nav-icon">🔒</span> Şifrə Dəyişdir</button>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main-content">
+
+      <!-- ── DASHBOARD ── -->
+      <div id="panel-dashboard" class="panel active">
+        <div class="page-title">Dashboard</div>
+        <div class="page-desc">Saytın ümumi vəziyyəti</div>
+        <div class="dash-grid">
+          <div class="dash-card"><div class="dash-num" id="statExp">7</div><div class="dash-lbl">İş Mərhələsi</div></div>
+          <div class="dash-card"><div class="dash-num" id="statProj">5</div><div class="dash-lbl">Layihə</div></div>
+          <div class="dash-card"><div class="dash-num" id="statSvc">5</div><div class="dash-lbl">Xidmət</div></div>
+          <div class="dash-card"><div class="dash-num"><span id="statSkill">6</span></div><div class="dash-lbl">Bacarıq</div></div>
+        </div>
+        <div class="admin-card">
+          <h3>📋 Son Dəyişikliklər</h3>
+          <div id="changeLog" style="font-size:.85rem;color:var(--text2);line-height:1.8">
+            Hələ heç bir dəyişiklik edilməyib.
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3>🚀 Sürətli Əməliyyatlar</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn-sm btn-primary" onclick="showPanel('settings')">Kontakt Məlumatları</button>
+            <button class="btn-sm btn-primary" onclick="showPanel('experience')">Yeni Vəzifə əlavə et</button>
+            <button class="btn-sm btn-primary" onclick="showPanel('projects')">Layihə əlavə et</button>
+            <button class="btn-sm btn-ghost" onclick="exportData()">Datanı Export et</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div id="panel-settings" class="panel">
+        <div class="page-title">Ümumi Məlumatlar</div>
+        <div class="page-desc">Kontakt məlumatları, sosial şəbəkələr, ünvan</div>
+        <div class="admin-card">
+          <h3>📞 Kontakt Məlumatları</h3>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">Ad Soyad</label><input class="inp" id="s-name" value="Əbülfəz Mustafazadə"></div>
+            <div class="form-group"><label class="lbl">Vəzifə</label><input class="inp" id="s-role" value="Data Analytics & Reporting Expert"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">E-poçt</label><input class="inp" id="s-email" type="email" value="abulfazmustafazade@outlook.com"></div>
+            <div class="form-group"><label class="lbl">WhatsApp nömrəsi</label><input class="inp" id="s-wa" value="994558357224"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">LinkedIn URL</label><input class="inp" id="s-li" value="https://www.linkedin.com/in/abulfazmustafazade/"></div>
+            <div class="form-group"><label class="lbl">Şəhər</label><input class="inp" id="s-city" value="Bakı, Azərbaycan"></div>
+          </div>
+          <button class="btn-sm btn-primary" onclick="saveSettings()">💾 Yadda Saxla</button>
+        </div>
+        <div class="admin-card">
+          <h3>🌐 Sayt URL</h3>
+          <div class="form-group"><label class="lbl">Domain</label><input class="inp" id="s-domain" value="https://www.abulfazmustafazade.com" placeholder="https://..."></div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:-8px;margin-bottom:16px">SEO canonical URL-ləri üçün istifadə edilir</div>
+          <button class="btn-sm btn-primary" onclick="saveSettings()">💾 Yadda Saxla</button>
+        </div>
+      </div>
+
+      <!-- ── ABOUT ── -->
+      <div id="panel-about" class="panel">
+        <div class="page-title">Haqqımda Bölməsi</div>
+        <div class="page-desc">Baş səhifədəki "Haqqımda" mətnini redaktə et</div>
+        <div class="admin-card">
+          <h3>🇦🇿 Azərbaycan dili</h3>
+          <div class="form-group"><label class="lbl">1-ci paraqraf</label>
+            <textarea class="inp" id="about-az-1" rows="4">Mən Əbülfəz Mustafazadə — Azerconnect Group-da Data Analytics & Reporting Expert kimi çalışan, 6+ il təcrübəyə malik data mütəxəssisiyəm.</textarea>
+          </div>
+          <div class="form-group"><label class="lbl">2-ci paraqraf</label>
+            <textarea class="inp" id="about-az-2" rows="4">Eyni zamanda HANDEX Training Center-də Data Analytics Müəllimi kimi Excel, Power BI və analitik düşüncəni 200+ mütəxəssisə öyrətmişəm.</textarea>
+          </div>
+          <button class="btn-sm btn-primary" onclick="saveAbout()">💾 Yadda Saxla</button>
+        </div>
+        <div class="admin-card">
+          <h3>🇬🇧 English</h3>
+          <div class="form-group"><label class="lbl">Paragraph 1</label>
+            <textarea class="inp" id="about-en-1" rows="4">I'm Abulfaz Mustafazade — Data Analytics & Reporting Expert at Azerconnect Group, with 6+ years of experience across HR analytics, manufacturing, and public sector data environments.</textarea>
+          </div>
+          <div class="form-group"><label class="lbl">Paragraph 2</label>
+            <textarea class="inp" id="about-en-2" rows="4">As an instructor at HANDEX Training Center, I've trained 200+ professionals in Excel, Power BI, and analytical thinking.</textarea>
+          </div>
+          <button class="btn-sm btn-primary" onclick="saveAbout()">💾 Yadda Saxla</button>
+        </div>
+      </div>
+
+      <!-- ── EXPERIENCE ── -->
+      <div id="panel-experience" class="panel">
+        <div class="page-title">İş Təcrübəsi</div>
+        <div class="page-desc">Karyera tarixçəsini idarə et</div>
+        <div class="admin-card">
+          <h3>➕ Yeni Vəzifə əlavə et</h3>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">Vəzifə adı <span class="badge-required">Vacib</span></label><input class="inp" id="exp-title" placeholder="Senior Data Analyst"></div>
+            <div class="form-group"><label class="lbl">Şirkət <span class="badge-required">Vacib</span></label><input class="inp" id="exp-company" placeholder="Azerconnect Group"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">Başlama tarixi</label><input class="inp" id="exp-start" placeholder="Jan 2025"></div>
+            <div class="form-group"><label class="lbl">Bitmə tarixi</label><input class="inp" id="exp-end" placeholder="İndi (boş burax)"></div>
+          </div>
+          <div class="form-group"><label class="lbl">Açıqlama</label><textarea class="inp" id="exp-desc" rows="3" placeholder="Əsas vəzifə və nailiyyətləriniz..."></textarea></div>
+          <div class="form-group"><label class="lbl">Taqlar (vergüllə)</label><input class="inp" id="exp-tags" placeholder="Power BI, SQL, Python"></div>
+          <div style="display:flex;gap:10px">
+            <button class="btn-sm btn-primary" onclick="addExp()">➕ Əlavə et</button>
+            <button class="btn-sm btn-ghost" onclick="clearExpForm()">Təmizlə</button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3>📋 Mövcud Vəzifələr</h3>
+          <table class="data-table">
+            <thead><tr><th>Vəzifə</th><th>Şirkət</th><th>Dövr</th><th>Status</th><th>Əməliyyat</th></tr></thead>
+            <tbody id="expTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── EDUCATION ── -->
+      <div id="panel-education" class="panel">
+        <div class="page-title">Təhsil</div>
+        <div class="page-desc">Akademik keçmişi idarə et</div>
+        <div class="admin-card">
+          <h3>➕ Yeni Təhsil əlavə et</h3>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">Dərəcə / Sertifikat</label><input class="inp" id="edu-degree" placeholder="Kompüter Elmləri üzrə Bakalavr"></div>
+            <div class="form-group"><label class="lbl">Müəssisə</label><input class="inp" id="edu-school" placeholder="Azərbaycan Texniki Universiteti"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">İllər</label><input class="inp" id="edu-years" placeholder="2014 — 2018"></div>
+            <div class="form-group"><label class="lbl">Qeyd</label><input class="inp" id="edu-note" placeholder="Fərqlənmə diplomu"></div>
+          </div>
+          <button class="btn-sm btn-primary" onclick="addEdu()">➕ Əlavə et</button>
+        </div>
+        <div class="admin-card">
+          <h3>📋 Mövcud Təhsil</h3>
+          <table class="data-table">
+            <thead><tr><th>Dərəcə</th><th>Müəssisə</th><th>İllər</th><th>Əməliyyat</th></tr></thead>
+            <tbody id="eduTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── SERVICES ── -->
+      <div id="panel-services" class="panel">
+        <div class="page-title">Xidmətlər</div>
+        <div class="page-desc">Xidmət kartlarını idarə et</div>
+        <div class="admin-card">
+          <h3>➕ Yeni Xidmət</h3>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">İkon (emoji)</label><input class="inp" id="svc-icon" placeholder="📊" style="font-size:1.4rem;text-align:center"></div>
+            <div class="form-group"><label class="lbl">Başlıq (AZ)</label><input class="inp" id="svc-title-az" placeholder="Data Analitika"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">Başlıq (EN)</label><input class="inp" id="svc-title-en" placeholder="Data Analytics"></div>
+            <div class="form-group"><label class="lbl">Taqlar</label><input class="inp" id="svc-tags" placeholder="Power BI, SQL, Python"></div>
+          </div>
+          <div class="form-group"><label class="lbl">Açıqlama (AZ)</label><textarea class="inp" id="svc-desc-az" rows="2"></textarea></div>
+          <div class="form-group"><label class="lbl">Açıqlama (EN)</label><textarea class="inp" id="svc-desc-en" rows="2"></textarea></div>
+          <button class="btn-sm btn-primary" onclick="addSvc()">➕ Əlavə et</button>
+        </div>
+        <div class="admin-card">
+          <h3>📋 Mövcud Xidmətlər</h3>
+          <table class="data-table">
+            <thead><tr><th>İkon</th><th>Başlıq</th><th>Taqlar</th><th>Əməliyyat</th></tr></thead>
+            <tbody id="svcTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── PROJECTS ── -->
+      <div id="panel-projects" class="panel">
+        <div class="page-title">Layihələr</div>
+        <div class="page-desc">Portfolio layihələrini idarə et</div>
+        <div class="admin-card">
+          <h3>➕ Yeni Layihə</h3>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">Emoji</label><input class="inp" id="proj-emoji" placeholder="📈" style="font-size:1.4rem;text-align:center;width:80px"></div>
+            <div class="form-group"><label class="lbl">Növ / Kateqoriya</label><input class="inp" id="proj-type" placeholder="HR Analytics · Power BI"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">Başlıq (AZ)</label><input class="inp" id="proj-title-az"></div>
+            <div class="form-group"><label class="lbl">Başlıq (EN)</label><input class="inp" id="proj-title-en"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">Açıqlama (AZ)</label><textarea class="inp" id="proj-desc-az" rows="2"></textarea></div>
+            <div class="form-group"><label class="lbl">Açıqlama (EN)</label><textarea class="inp" id="proj-desc-en" rows="2"></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="lbl">Biznes Təsiri</label><input class="inp" id="proj-impact" placeholder="Manual reporting time cut from days to minutes"></div>
+            <div class="form-group"><label class="lbl">Alətlər</label><input class="inp" id="proj-tools" placeholder="Power BI · SQL · Python"></div>
+          </div>
+          <button class="btn-sm btn-primary" onclick="addProj()">➕ Əlavə et</button>
+        </div>
+        <div class="admin-card">
+          <h3>📋 Mövcud Layihələr</h3>
+          <table class="data-table">
+            <thead><tr><th>Em</th><th>Başlıq</th><th>Növ</th><th>Alətlər</th><th>Əməliyyat</th></tr></thead>
+            <tbody id="projTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── SKILLS ── -->
+      <div id="panel-skills" class="panel">
+        <div class="page-title">Bacarıqlar</div>
+        <div class="page-desc">Texniki bacarıqları və faizləri idarə et</div>
+        <div class="admin-card">
+          <h3>Bacarıq Səviyyələri</h3>
+          <div id="skillsList"></div>
+          <div style="display:flex;gap:12px;margin-top:8px;align-items:center">
+            <input class="inp" id="skill-name" placeholder="Yeni bacarıq adı" style="flex:2">
+            <input class="inp" id="skill-pct" type="number" min="0" max="100" placeholder="%" style="flex:0 0 80px">
+            <button class="btn-sm btn-primary" onclick="addSkill()">➕</button>
+          </div>
+          <button class="btn-sm btn-primary" onclick="saveSkills()" style="margin-top:14px">💾 Yadda Saxla</button>
+        </div>
+      </div>
+
+      <!-- ── SEO ── -->
+      <div id="panel-seo" class="panel">
+        <div class="page-title">SEO Parametrləri</div>
+        <div class="page-desc">Google axtarışı üçün optimallaşdırma. Google Ads üçün kritik!</div>
+        <div class="admin-card">
+          <h3>🔍 Meta Teqlər</h3>
+          <div class="form-group"><label class="lbl">Ana Səhifə Başlığı (AZ)</label><input class="inp" id="seo-title-az" value="Əbülfəz Mustafazadə | Data Analitiki, Müəllim, Konsultant — Bakı"></div>
+          <div class="form-group"><label class="lbl">Ana Səhifə Başlığı (EN)</label><input class="inp" id="seo-title-en" value="Abulfaz Mustafazade | Data Analyst, Trainer & Consultant — Baku"></div>
+          <div class="form-group"><label class="lbl">Meta Təsvir (AZ)</label><textarea class="inp" id="seo-desc-az" rows="3">Əbülfəz Mustafazadə — Azərbaycanlı Data Analitiki. Power BI, Excel, SQL, Python. Azerconnect Group-da Data Analytics & Reporting Expert. Korporativ treninqlər, HR analitika, dashboard inkişafı.</textarea></div>
+          <div class="form-group"><label class="lbl">Meta Təsvir (EN)</label><textarea class="inp" id="seo-desc-en" rows="3">Abulfaz Mustafazade — Data Analytics & Reporting Expert at Azerconnect Group. Power BI, Excel, SQL, Python. Corporate training, HR analytics, dashboard development. Based in Baku, Azerbaijan.</textarea></div>
+          <div class="form-group"><label class="lbl">Açar Sözlər (Keywords)</label><input class="inp" id="seo-kw" value="Power BI, Data Analyst, HR Analytics, Excel Training, SQL, Python, Baku Azerbaijan, Abulfaz Mustafazade"></div>
+          <button class="btn-sm btn-primary" onclick="saveSEO()">💾 Yadda Saxla</button>
+        </div>
+        <div class="admin-card">
+          <h3>🎯 Google Ads Tövsiyələri</h3>
+          <div class="accordion-item">
+            <div class="accordion-head" onclick="toggleAcc(this)">📌 Google Search Campaign — Tövsiyə edilən açar sözlər <span class="arrow">▼</span></div>
+            <div class="accordion-body">
+              <p style="margin-bottom:14px;color:var(--text2);font-size:.88rem">Bu açar sözləri Google Ads hesabınızda "Exact Match" və "Phrase Match" olaraq əlavə edin:</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="background:rgba(45,127,255,.08);border:1px solid rgba(45,127,255,.2);border-radius:6px;padding:8px 12px;font-size:.8rem;color:var(--text2)">"Power BI dashboard Baku"</div>
+                <div style="background:rgba(45,127,255,.08);border:1px solid rgba(45,127,255,.2);border-radius:6px;padding:8px 12px;font-size:.8rem;color:var(--text2)">"Data analytics consultant Azerbaijan"</div>
+                <div style="background:rgba(45,127,255,.08);border:1px solid rgba(45,127,255,.2);border-radius:6px;padding:8px 12px;font-size:.8rem;color:var(--text2)">"Excel training Baku"</div>
+                <div style="background:rgba(45,127,255,.08);border:1px solid rgba(45,127,255,.2);border-radius:6px;padding:8px 12px;font-size:.8rem;color:var(--text2)">"HR analytics dashboard"</div>
+                <div style="background:rgba(45,127,255,.08);border:1px solid rgba(45,127,255,.2);border-radius:6px;padding:8px 12px;font-size:.8rem;color:var(--text2)">"Power BI kurs Bakı"</div>
+                <div style="background:rgba(45,127,255,.08);border:1px solid rgba(45,127,255,.2);border-radius:6px;padding:8px 12px;font-size:.8rem;color:var(--text2)">"data analyst freelance Azerbaijan"</div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-head" onclick="toggleAcc(this)">📊 Google Search Console Quraşdırma <span class="arrow">▼</span></div>
+            <div class="accordion-body">
+              <ol style="color:var(--text2);font-size:.88rem;line-height:2;padding-left:20px">
+                <li>search.google.com/search-console → Sayt əlavə et</li>
+                <li>Domain: <code style="color:var(--accent)">abulfazmustafazade.com</code></li>
+                <li>DNS TXT record-u domain provayderinizə əlavə edin</li>
+                <li>Sitemap URL-ni əlavə edin: <code style="color:var(--accent)">/sitemap.xml</code></li>
+                <li>İndekslənməni izləyin</li>
+              </ol>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-head" onclick="toggleAcc(this)">💰 Google Ads Kampaniya Strukturu <span class="arrow">▼</span></div>
+            <div class="accordion-body">
+              <div style="color:var(--text2);font-size:.88rem;line-height:1.9">
+                <strong style="color:var(--text)">Kampaniya 1 — Xidmətlər (AZ hədəf)</strong><br>
+                Ad Group 1: Power BI | Ad Group 2: Excel Treninq | Ad Group 3: HR Analitika<br><br>
+                <strong style="color:var(--text)">Kampaniya 2 — Treninq (AZ+RU hədəf)</strong><br>
+                Ad Group 1: Korporativ Treninq | Ad Group 2: Data Analytics Kursu<br><br>
+                <strong style="color:var(--text)">Tövsiyə edilən büdcə:</strong> Gündəlik 5-15 AZN (başlanğıc üçün)<br>
+                <strong style="color:var(--text)">Landing page:</strong> <code style="color:var(--accent)">/az/contact.html</code> (conversion tracking əlavə et)
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3>📍 Google My Business</h3>
+          <p style="color:var(--text2);font-size:.88rem;line-height:1.8;margin-bottom:14px">
+            Freelance konsultant üçün Google My Business hesabı yaradın ki, "data analyst Bakı" axtarışlarında xəritədə görünəsiniz.
+          </p>
+          <a href="https://business.google.com" target="_blank" class="btn-sm btn-ghost">Google My Business →</a>
+        </div>
+      </div>
+
+      <!-- ── ANALYTICS ── -->
+      <div id="panel-analytics" class="panel">
+        <div class="page-title">Google Analytics</div>
+        <div class="page-desc">Sayt ziyarətçilərini izləyin</div>
+        <div class="admin-card">
+          <h3>📊 Google Analytics 4 Quraşdırma</h3>
+          <div class="form-group">
+            <label class="lbl">Measurement ID (G-XXXXXXXXXX)</label>
+            <input class="inp" id="ga-id" placeholder="G-XXXXXXXXXX">
+          </div>
+          <p style="color:var(--muted);font-size:.8rem;margin:-8px 0 16px">analytics.google.com → Yeni mülk yarat → Measurement ID kopyala</p>
+          <button class="btn-sm btn-primary" onclick="saveGA()">💾 Aktivləşdir</button>
+          <div id="ga-status" style="margin-top:12px;font-size:.82rem;color:var(--muted)"></div>
+        </div>
+        <div class="admin-card">
+          <h3>🎯 Conversion Tracking (Google Ads)</h3>
+          <div class="form-group">
+            <label class="lbl">Conversion ID</label>
+            <input class="inp" id="ads-conv-id" placeholder="AW-XXXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label class="lbl">Conversion Label</label>
+            <input class="inp" id="ads-conv-label" placeholder="xXxXxxXXxxXXxxx">
+          </div>
+          <p style="color:var(--muted);font-size:.8rem;margin:-8px 0 16px">Google Ads → Alətlər → Conversions → Yeni conversion yarat → "Contact form submission"</p>
+          <button class="btn-sm btn-primary" onclick="saveConv()">💾 Yadda Saxla</button>
+        </div>
+      </div>
+
+      <!-- ── BACKUP ── -->
+      <div id="panel-backup" class="panel">
+        <div class="page-title">Yedəkləmə & Bərpa</div>
+        <div class="page-desc">Bütün məzmunu JSON olaraq export/import edin</div>
+        <div class="admin-card">
+          <h3>💾 Data Export</h3>
+          <p style="color:var(--text2);font-size:.88rem;margin-bottom:16px">Bütün admin panel məlumatlarını JSON faylı kimi yükləyin.</p>
+          <button class="btn-sm btn-primary" onclick="exportData()">⬇️ JSON Export</button>
+        </div>
+        <div class="admin-card">
+          <h3>📂 Data Import</h3>
+          <p style="color:var(--text2);font-size:.88rem;margin-bottom:16px">Əvvəlcədən export edilmiş JSON faylını yükləyin.</p>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+          <button class="btn-sm btn-ghost" onclick="document.getElementById('importFile').click()">⬆️ JSON Import</button>
+        </div>
+        <div class="admin-card">
+          <h3>🗑️ Bütün Datanı Sıfırla</h3>
+          <p style="color:var(--text2);font-size:.88rem;margin-bottom:16px">Diqqət: Bu əməliyyat bütün admin panel məlumatlarını silir!</p>
+          <button class="btn-sm btn-danger" onclick="resetAll()">🗑️ Sıfırla</button>
+        </div>
+      </div>
+
+      <!-- ── PASSWORD ── -->
+      <div id="panel-password" class="panel">
+        <div class="page-title">Şifrə Dəyişdir</div>
+        <div class="page-desc">Admin panel giriş şifrəsini dəyişin</div>
+        <div class="admin-card" style="max-width:400px">
+          <h3>🔒 Şifrə Yenilə</h3>
+          <div class="form-group"><label class="lbl">Cari Şifrə</label><input class="inp" id="pw-old" type="password"></div>
+          <div class="form-group"><label class="lbl">Yeni Şifrə</label><input class="inp" id="pw-new" type="password"></div>
+          <div class="form-group"><label class="lbl">Yeni Şifrəni Təsdiqlə</label><input class="inp" id="pw-conf" type="password"></div>
+          <button class="btn-sm btn-primary" onclick="changePassword()">🔒 Dəyişdir</button>
+        </div>
+      </div>
+
+    </div><!-- main-content -->
+  </div><!-- admin-body -->
+</div><!-- adminApp -->
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+const DEFAULT_USER = 'admin';
+const DEFAULT_PASS_HASH = btoa('am2025!'); // Simple obfuscation
+
+// ── STORAGE HELPERS ─────────────────────────────────────────
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem('am_'+k)); } catch(e){ return null; }},
+  set: (k,v) => localStorage.setItem('am_'+k, JSON.stringify(v)),
+  del: k => localStorage.removeItem('am_'+k)
+};
+
+// ── AUTH ─────────────────────────────────────────────────────
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const storedHash = S.get('password') || DEFAULT_PASS_HASH;
+  if (u === (S.get('username') || DEFAULT_USER) && btoa(p) === storedHash) {
+    S.set('session', Date.now());
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'flex';
+    initApp();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    setTimeout(() => document.getElementById('loginErr').style.display='none', 3000);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter' && document.getElementById('loginScreen').style.display!=='none') doLogin();
+});
+function doLogout() {
+  S.del('session');
+  location.reload();
+}
+// Check session
+window.addEventListener('load', () => {
+  const sess = S.get('session');
+  if (sess && Date.now() - sess < 8*3600*1000) {
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminApp').style.display='flex';
+    initApp();
+  }
+});
+
+// ── INIT ─────────────────────────────────────────────────────
+function initApp() {
+  startClock();
+  loadExpTable();
+  loadEduTable();
+  loadSvcTable();
+  loadProjTable();
+  loadSkillsList();
+  loadSettings();
+  loadSEO();
+}
+
+function startClock() {
+  function tick() {
+    const now = new Date();
+    document.getElementById('headerTime').textContent = now.toLocaleString('az-AZ',{weekday:'short',hour:'2-digit',minute:'2-digit'});
+  }
+  tick(); setInterval(tick, 30000);
+}
+
+// ── PANEL NAVIGATION ─────────────────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
+  });
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type==='err' ? ' err' : '');
+  setTimeout(() => t.className = '', 3000);
+}
+
+function logChange(msg) {
+  const log = S.get('changelog') || [];
+  log.unshift({ time: new Date().toLocaleString('az-AZ'), msg });
+  if (log.length > 20) log.pop();
+  S.set('changelog', log);
+  const el = document.getElementById('changeLog');
+  if (el) el.innerHTML = log.slice(0,8).map(l=>`<div>📝 <strong>${l.time}</strong> — ${l.msg}</div>`).join('') || 'Hələ heç bir dəyişiklik edilməyib.';
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────
+function loadSettings() {
+  const d = S.get('settings') || {};
+  ['name','role','email','wa','li','city','domain'].forEach(k => {
+    const el = document.getElementById('s-'+k);
+    if (el && d[k]) el.value = d[k];
+  });
+}
+function saveSettings() {
+  const d = {};
+  ['name','role','email','wa','li','city','domain'].forEach(k => {
+    const el = document.getElementById('s-'+k);
+    if (el) d[k] = el.value;
+  });
+  S.set('settings', d);
+  logChange('Ümumi məlumatlar yeniləndi');
+  toast('✓ Yadda saxlanıldı!');
+}
+
+// ── ABOUT ─────────────────────────────────────────────────────
+function saveAbout() {
+  S.set('about', {
+    az1: document.getElementById('about-az-1').value,
+    az2: document.getElementById('about-az-2').value,
+    en1: document.getElementById('about-en-1').value,
+    en2: document.getElementById('about-en-2').value,
+  });
+  logChange('"Haqqımda" mətni yeniləndi');
+  toast('✓ Haqqımda yeniləndi!');
+}
+
+// ── EXPERIENCE ───────────────────────────────────────────────
+function getExps() {
+  return S.get('experiences') || [
+    {id:1, title:'Data Analytics & Reporting Expert', company:'Azerconnect Group', start:'Jan 2026', end:'', desc:'Multi-layered Power BI dashboards; full report automation; Excel training program.', tags:'Power BI,DAX,Excel+VBA,HR Analytics', current:true},
+    {id:2, title:'HR Data & Digitalization Senior Specialist', company:'Azerconnect Group', start:'Jan 2025', end:'Jan 2026', desc:'Large-scale HR data auditing and cleansing; data quality monitoring.', tags:'HR Analytics,SQL,Power BI', current:false},
+    {id:3, title:'Data Analytics Instructor', company:'HANDEX Training Center', start:'Jan 2024', end:'', desc:'Excel & Power BI training for professionals; 200+ trained.', tags:'Excel,Power BI,Training', current:true},
+    {id:4, title:'Human Resources Analyst', company:'Avrora Group', start:'Mar 2024', end:'Jan 2025', desc:'Python data analysis; Power BI reports; Excel training.', tags:'Python,Power BI,Excel', current:false},
+    {id:5, title:'Senior Data Analyst', company:'Azergoktel LLC', start:'Sep 2022', end:'', desc:'Legacy data cleansing; cross-database integration; training sessions.', tags:'SQL,Oracle,Python', current:true},
+    {id:6, title:'Production Planning & Reporting Analyst', company:'Azergoktel LLC', start:'Apr 2021', end:'Sep 2022', desc:'Electronic data management system; report automation; cost reduction proposals.', tags:'Python,VBA,Excel', current:false},
+    {id:7, title:'Chief Specialist — Senior Inspector', company:'State Employment Service', start:'Aug 2019', end:'Jun 2020', desc:'Statistical reports; citizen applications; IT support.', tags:'Reporting,Excel', current:false},
+  ];
+}
+function loadExpTable() {
+  const exps = getExps();
+  document.getElementById('statExp').textContent = exps.length;
+  const tbody = document.getElementById('expTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = exps.map(e => `<tr>
+    <td style="font-weight:600;color:var(--text)">${e.title}</td>
+    <td>${e.company}</td>
+    <td style="white-space:nowrap">${e.start} — ${e.end||'İndi'}</td>
+    <td>${e.current?'<span class="status status-active">● İndi</span>':'<span class="status status-past">Bitib</span>'}</td>
+    <td><button class="btn-sm btn-danger" style="padding:4px 10px" onclick="delExp(${e.id})">Sil</button></td>
+  </tr>`).join('');
+}
+function addExp() {
+  const title = document.getElementById('exp-title').value.trim();
+  const company = document.getElementById('exp-company').value.trim();
+  if (!title || !company) { toast('Ad və şirkəti doldurun!','err'); return; }
+  const exps = getExps();
+  const id = Date.now();
+  exps.unshift({id, title, company,
+    start: document.getElementById('exp-start').value,
+    end:   document.getElementById('exp-end').value,
+    desc:  document.getElementById('exp-desc').value,
+    tags:  document.getElementById('exp-tags').value,
+    current: !document.getElementById('exp-end').value
+  });
+  S.set('experiences', exps);
+  loadExpTable();
+  clearExpForm();
+  logChange(`Yeni vəzifə əlavə edildi: ${title} @ ${company}`);
+  toast('✓ Vəzifə əlavə edildi!');
+}
+function delExp(id) {
+  if (!confirm('Bu vəzifəni silmək istədiyinizə əminsiniz?')) return;
+  const exps = getExps().filter(e => e.id !== id);
+  S.set('experiences', exps);
+  loadExpTable();
+  logChange('Vəzifə silindi');
+  toast('Silindi.');
+}
+function clearExpForm() {
+  ['exp-title','exp-company','exp-start','exp-end','exp-desc','exp-tags'].forEach(id => document.getElementById(id).value='');
+}
+
+// ── EDUCATION ─────────────────────────────────────────────────
+function getEdus() {
+  return S.get('educations') || [
+    {id:1, degree:'Data Analytics', school:'ABB Tech Academy', years:'Dec 2023 — Apr 2024', note:'Data analytics program'},
+    {id:2, degree:"Master's — Teaching Methodology", school:'Azerbaijan State Pedagogical University', years:'2018 — 2020', note:'Methodology of Informatics'},
+    {id:3, degree:"Bachelor's — Computer Sciences", school:'Azerbaijan Technical University', years:'2014 — 2018', note:'Computer Sciences Faculty'},
+  ];
+}
+function loadEduTable() {
+  const edus = getEdus();
+  const tbody = document.getElementById('eduTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = edus.map(e => `<tr>
+    <td style="font-weight:600;color:var(--text)">${e.degree}</td>
+    <td>${e.school}</td>
+    <td>${e.years}</td>
+    <td><button class="btn-sm btn-danger" style="padding:4px 10px" onclick="delEdu(${e.id})">Sil</button></td>
+  </tr>`).join('');
+}
+function addEdu() {
+  const degree = document.getElementById('edu-degree').value.trim();
+  if (!degree) { toast('Dərəcə adını daxil edin!','err'); return; }
+  const edus = getEdus();
+  edus.unshift({id:Date.now(), degree, school:document.getElementById('edu-school').value, years:document.getElementById('edu-years').value, note:document.getElementById('edu-note').value});
+  S.set('educations', edus);
+  loadEduTable();
+  ['edu-degree','edu-school','edu-years','edu-note'].forEach(id => document.getElementById(id).value='');
+  logChange(`Yeni təhsil əlavə edildi: ${degree}`);
+  toast('✓ Təhsil əlavə edildi!');
+}
+function delEdu(id) {
+  if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+  S.set('educations', getEdus().filter(e => e.id !== id));
+  loadEduTable();
+  toast('Silindi.');
+}
+
+// ── SERVICES ─────────────────────────────────────────────────
+function getSvcs() {
+  return S.get('services') || [
+    {id:1, icon:'📊', title:'Data Analytics & Reporting', tags:'SQL, Excel, Python'},
+    {id:2, icon:'👥', title:'HR Analytics & Dashboards', tags:'Power BI, HR Metrics, KPIs'},
+    {id:3, icon:'⚡', title:'Power BI Development', tags:'Power BI, DAX, Power Query'},
+    {id:4, icon:'🤖', title:'Process Automation', tags:'Python, VBA, Excel'},
+    {id:5, icon:'🎓', title:'Training & Workshops', tags:'Excel, Power BI, SQL'},
+  ];
+}
+function loadSvcTable() {
+  const svcs = getSvcs();
+  document.getElementById('statSvc').textContent = svcs.length;
+  const tbody = document.getElementById('svcTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = svcs.map(s => `<tr>
+    <td style="font-size:1.4rem">${s.icon}</td>
+    <td style="font-weight:600;color:var(--text)">${s.title}</td>
+    <td><div style="display:flex;flex-wrap:wrap;gap:4px">${s.tags.split(',').map(t=>`<span style="background:rgba(45,127,255,.1);border:1px solid rgba(45,127,255,.2);padding:2px 8px;border-radius:100px;font-size:.7rem;color:var(--accent)">${t.trim()}</span>`).join('')}</div></td>
+    <td><button class="btn-sm btn-danger" style="padding:4px 10px" onclick="delSvc(${s.id})">Sil</button></td>
+  </tr>`).join('');
+}
+function addSvc() {
+  const icon = document.getElementById('svc-icon').value || '📊';
+  const title = document.getElementById('svc-title-en').value.trim() || document.getElementById('svc-title-az').value.trim();
+  if (!title) { toast('Başlığı daxil edin!','err'); return; }
+  const svcs = getSvcs();
+  svcs.push({id:Date.now(), icon, title, titleAz:document.getElementById('svc-title-az').value, titleEn:document.getElementById('svc-title-en').value, descAz:document.getElementById('svc-desc-az').value, descEn:document.getElementById('svc-desc-en').value, tags:document.getElementById('svc-tags').value});
+  S.set('services', svcs);
+  loadSvcTable();
+  ['svc-icon','svc-title-az','svc-title-en','svc-tags','svc-desc-az','svc-desc-en'].forEach(id=>document.getElementById(id).value='');
+  logChange(`Yeni xidmət: ${title}`);
+  toast('✓ Xidmət əlavə edildi!');
+}
+function delSvc(id) {
+  if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+  S.set('services', getSvcs().filter(s => s.id !== id));
+  loadSvcTable();
+  toast('Silindi.');
+}
+
+// ── PROJECTS ─────────────────────────────────────────────────
+function getProjs() {
+  return S.get('projects') || [
+    {id:1, emoji:'📈', type:'HR Analytics · Power BI', titleEn:'Enterprise HR Dashboard', impact:'Manual reporting fully automated', tools:'Power BI · DAX · Excel'},
+    {id:2, emoji:'🤖', type:'Automation · Python/VBA', titleEn:'Report Automation System', impact:'Days to minutes', tools:'Python · VBA · Power Query'},
+    {id:3, emoji:'🧑‍💼', type:'Training · HANDEX', titleEn:'Data Analytics Training', impact:'200+ trained', tools:'Excel · Power BI'},
+    {id:4, emoji:'🔍', type:'Data Quality', titleEn:'HR Data Cleansing', impact:'Data integrity across 5+ systems', tools:'Python · SQL · Oracle'},
+    {id:5, emoji:'🏭', type:'Manufacturing BI', titleEn:'Production Analytics', impact:'Operational efficiency improved', tools:'Python · VBA · Excel'},
+  ];
+}
+function loadProjTable() {
+  const projs = getProjs();
+  document.getElementById('statProj').textContent = projs.length;
+  const tbody = document.getElementById('projTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = projs.map(p => `<tr>
+    <td style="font-size:1.4rem">${p.emoji}</td>
+    <td style="font-weight:600;color:var(--text)">${p.titleEn||p.titleAz||'—'}</td>
+    <td style="font-size:.8rem;color:var(--muted)">${p.type}</td>
+    <td style="font-size:.8rem;color:var(--text2)">${p.tools}</td>
+    <td><button class="btn-sm btn-danger" style="padding:4px 10px" onclick="delProj(${p.id})">Sil</button></td>
+  </tr>`).join('');
+}
+function addProj() {
+  const titleEn = document.getElementById('proj-title-en').value.trim();
+  if (!titleEn) { toast('Başlığı daxil edin!','err'); return; }
+  const projs = getProjs();
+  projs.unshift({id:Date.now(), emoji:document.getElementById('proj-emoji').value||'📊', type:document.getElementById('proj-type').value, titleAz:document.getElementById('proj-title-az').value, titleEn, descAz:document.getElementById('proj-desc-az').value, descEn:document.getElementById('proj-desc-en').value, impact:document.getElementById('proj-impact').value, tools:document.getElementById('proj-tools').value});
+  S.set('projects', projs);
+  loadProjTable();
+  ['proj-emoji','proj-type','proj-title-az','proj-title-en','proj-desc-az','proj-desc-en','proj-impact','proj-tools'].forEach(id=>document.getElementById(id).value='');
+  logChange(`Yeni layihə: ${titleEn}`);
+  toast('✓ Layihə əlavə edildi!');
+}
+function delProj(id) {
+  if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+  S.set('projects', getProjs().filter(p => p.id !== id));
+  loadProjTable();
+  toast('Silindi.');
+}
+
+// ── SKILLS ───────────────────────────────────────────────────
+function getSkills() {
+  return S.get('skills') || [
+    {name:'Microsoft Excel + VBA', pct:95},{name:'Power BI', pct:92},{name:'SQL / Oracle', pct:85},
+    {name:'Python', pct:78},{name:'Data Visualization', pct:90},{name:'HR Analytics', pct:88}
+  ];
+}
+function loadSkillsList() {
+  const skills = getSkills();
+  document.getElementById('statSkill').textContent = skills.length;
+  const el = document.getElementById('skillsList');
+  if (!el) return;
+  el.innerHTML = skills.map((s,i) => `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+    <input class="inp" value="${s.name}" style="flex:1" onchange="updateSkill(${i},'name',this.value)">
+    <input class="inp" type="number" value="${s.pct}" min="0" max="100" style="width:72px" onchange="updateSkill(${i},'pct',+this.value)">
+    <span style="font-size:.85rem;color:var(--accent);width:36px">${s.pct}%</span>
+    <button class="btn-sm btn-danger" style="padding:4px 8px;flex-shrink:0" onclick="delSkill(${i})">✕</button>
+  </div>`).join('');
+}
+function updateSkill(i, key, val) {
+  const skills = getSkills();
+  skills[i][key] = val;
+  S.set('skills', skills);
+  loadSkillsList();
+}
+function addSkill() {
+  const name = document.getElementById('skill-name').value.trim();
+  const pct = +document.getElementById('skill-pct').value || 80;
+  if (!name) { toast('Bacarıq adını daxil edin!','err'); return; }
+  const skills = getSkills();
+  skills.push({name, pct});
+  S.set('skills', skills);
+  document.getElementById('skill-name').value=''; document.getElementById('skill-pct').value='';
+  loadSkillsList();
+  toast('✓ Bacarıq əlavə edildi!');
+}
+function delSkill(i) {
+  const skills = getSkills();
+  skills.splice(i,1);
+  S.set('skills', skills);
+  loadSkillsList();
+}
+function saveSkills() {
+  logChange('Bacarıqlar yeniləndi');
+  toast('✓ Bacarıqlar yadda saxlanıldı!');
+}
+
+// ── SEO ──────────────────────────────────────────────────────
+function loadSEO() {
+  const d = S.get('seo') || {};
+  ['title-az','title-en','desc-az','desc-en','kw'].forEach(k => {
+    const el = document.getElementById('seo-'+k);
+    if (el && d[k]) el.value = d[k];
+  });
+}
+function saveSEO() {
+  const d = {};
+  ['title-az','title-en','desc-az','desc-en','kw'].forEach(k => {
+    const el = document.getElementById('seo-'+k);
+    if (el) d[k] = el.value;
+  });
+  S.set('seo', d);
+  logChange('SEO parametrləri yeniləndi');
+  toast('✓ SEO yadda saxlanıldı!');
+}
+
+// ── ANALYTICS ────────────────────────────────────────────────
+function saveGA() {
+  const id = document.getElementById('ga-id').value.trim();
+  if (!id.startsWith('G-')) { toast('Düzgün GA4 ID daxil edin (G-XXXXXXXXXX)','err'); return; }
+  S.set('ga_id', id);
+  document.getElementById('ga-status').innerHTML = `✓ GA4 ID yadda saxlanıldı: <strong style="color:var(--accent)">${id}</strong><br><span style="font-size:.78rem">Bu ID-ni sayt HTML fayllarına əlavə etmək lazımdır</span>`;
+  logChange(`GA4 ID əlavə edildi: ${id}`);
+  toast('✓ GA4 ID yadda saxlanıldı!');
+}
+function saveConv() {
+  S.set('ads_conv', {id:document.getElementById('ads-conv-id').value, label:document.getElementById('ads-conv-label').value});
+  logChange('Google Ads Conversion parametrləri əlavə edildi');
+  toast('✓ Conversion tracking yadda saxlanıldı!');
+}
+
+// ── ACCORDION ────────────────────────────────────────────────
+function toggleAcc(head) {
+  const item = head.parentElement;
+  document.querySelectorAll('.accordion-item.open').forEach(a => { if(a!==item) a.classList.remove('open'); });
+  item.classList.toggle('open');
+}
+
+// ── PASSWORD ─────────────────────────────────────────────────
+function changePassword() {
+  const old = document.getElementById('pw-old').value;
+  const nw  = document.getElementById('pw-new').value;
+  const cf  = document.getElementById('pw-conf').value;
+  const curr = S.get('password') || DEFAULT_PASS_HASH;
+  if (btoa(old) !== curr) { toast('Cari şifrə yanlışdır!','err'); return; }
+  if (nw.length < 6) { toast('Şifrə ən azı 6 simvol olmalıdır!','err'); return; }
+  if (nw !== cf) { toast('Şifrələr uyğun gəlmir!','err'); return; }
+  S.set('password', btoa(nw));
+  ['pw-old','pw-new','pw-conf'].forEach(id => document.getElementById(id).value='');
+  logChange('Şifrə dəyişdirildi');
+  toast('✓ Şifrə yeniləndi!');
+}
+
+// ── BACKUP ───────────────────────────────────────────────────
+function exportData() {
+  const data = {};
+  ['experiences','educations','services','projects','skills','settings','seo','about'].forEach(k => { data[k] = S.get(k); });
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'am_portfolio_backup_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click(); URL.revokeObjectURL(url);
+  toast('✓ Data export edildi!');
+}
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      Object.entries(data).forEach(([k,v]) => { if(v) S.set(k,v); });
+      initApp();
+      logChange('Data import edildi: '+file.name);
+      toast('✓ Data uğurla import edildi!');
+    } catch(err) { toast('JSON faylı yanlışdır!','err'); }
+  };
+  reader.readAsText(file);
+}
+function resetAll() {
+  if (!confirm('Bütün admin məlumatlarını silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz!')) return;
+  ['experiences','educations','services','projects','skills','settings','seo','about','changelog'].forEach(k => S.del(k));
+  initApp();
+  toast('Bütün data sıfırlandı.');
+}
+</script>
+</body>
+</html>

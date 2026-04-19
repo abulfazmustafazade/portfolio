@@ -1,0 +1,75 @@
+/* ═══════════════════════════════════════
+   THEME.CSS — Dark & Light Mode Variables
+   ═══════════════════════════════════════ */
+
+:root,
+[data-theme="dark"] {
+  --bg-primary:      #080f1e;
+  --bg-secondary:    #0c1730;
+  --bg-tertiary:     #111f40;
+  --bg-card:         rgba(255,255,255,0.03);
+  --bg-card-hover:   rgba(45,127,255,0.06);
+
+  --text-primary:    #eef3ff;
+  --text-secondary:  #a8c8f0;
+  --text-muted:      rgba(130,170,220,0.55);
+  --text-inverse:    #080f1e;
+
+  --accent:          #1a5cdb;
+  --accent-bright:   #2d7fff;
+  --accent-light:    #5ba3ff;
+  --accent-ice:      #a8d4ff;
+
+  --border:          rgba(168,212,255,0.1);
+  --border-hover:    rgba(45,127,255,0.35);
+  --glass:           rgba(255,255,255,0.03);
+
+  --nav-bg:          rgba(8,15,30,0.88);
+  --shadow:          0 20px 60px rgba(0,0,0,0.5);
+  --shadow-blue:     0 12px 40px rgba(45,127,255,0.35);
+
+  --grid-line:       rgba(45,127,255,0.04);
+  --success:         #4ade80;
+  --warning:         #fbbf24;
+
+  --scrollbar-track: #080f1e;
+  --scrollbar-thumb: #1a5cdb;
+}
+
+[data-theme="light"] {
+  --bg-primary:      #f4f8ff;
+  --bg-secondary:    #e8f0fc;
+  --bg-tertiary:     #dde8f8;
+  --bg-card:         rgba(255,255,255,0.85);
+  --bg-card-hover:   rgba(45,127,255,0.06);
+
+  --text-primary:    #0c1a36;
+  --text-secondary:  #2a4a7a;
+  --text-muted:      rgba(40,80,150,0.55);
+  --text-inverse:    #f4f8ff;
+
+  --accent:          #1a5cdb;
+  --accent-bright:   #1a4ec0;
+  --accent-light:    #3a7de8;
+  --accent-ice:      #1a4ec0;
+
+  --border:          rgba(26,92,219,0.14);
+  --border-hover:    rgba(26,92,219,0.4);
+  --glass:           rgba(255,255,255,0.7);
+
+  --nav-bg:          rgba(244,248,255,0.92);
+  --shadow:          0 20px 60px rgba(26,92,219,0.1);
+  --shadow-blue:     0 12px 40px rgba(26,92,219,0.22);
+
+  --grid-line:       rgba(26,92,219,0.05);
+  --success:         #16a34a;
+  --warning:         #d97706;
+
+  --scrollbar-track: #e8f0fc;
+  --scrollbar-thumb: #1a5cdb;
+}
+
+/* Smooth theme transition */
+*,*::before,*::after {
+  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.25s ease, box-shadow 0.35s ease;
+}
