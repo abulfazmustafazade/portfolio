@@ -18,7 +18,7 @@
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
   <button class="mobile-close" id="mobileClose">✕</button>
-  <a href="main.html"class="active">Ana Səhifə</a>
+  <a href="index.html"class="active">Ana Səhifə</a>
 <a href="experience.html">Təcrübə</a>
 <a href="services.html">Xidmətlər</a>
 <a href="projects.html">Layihələr</a>
